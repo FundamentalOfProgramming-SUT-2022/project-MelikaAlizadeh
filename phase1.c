@@ -348,7 +348,6 @@ int findstring(char address[], char string[], int starpos, int character, int li
                     }
                 }
             }
-            else
         }
         if (c == EOF)
             break;
@@ -1900,7 +1899,7 @@ void replacestr()
     if (check != -1)
     {
         removechar(caddress, secondfile, 1, size, 1, check);
-        replaceline(caddress, fstring2, check, 1);
+        replaceline(caddress, fstring1, fstring2, check, 1);
     }
     else
         printf("this string does not exist.\n");
