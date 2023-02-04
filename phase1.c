@@ -226,19 +226,22 @@ int findstring(char address[], char string[], int starpos, int character, int li
                     result = fchar;
                 while (condition == 1)
                 {
-                    counter++;
-                    character++;
-                    if ((check3 == 1) && (string[j] == ' ') || (string[j] == '\0'))
+                    counter += 1;
+                    character += 1;
+                    if ((string[j] == ' ') || (string[j] == '\0'))
                     {
-                        check3++;
-                        break;
+                        if (check3 == 1)
+                        {
+                            check3 = 2;
+                            break;
+                        }
                     }
-                    if (c == string[j])
+                    if (string[j] == c)
                     {
-                        j++;
                         check3 = 1;
+                        j++;
                     }
-                    else if (c != string[j])
+                    else
                     {
                         check3 = 0;
                         j = i;
@@ -246,23 +249,23 @@ int findstring(char address[], char string[], int starpos, int character, int li
                     c = fgetc(file);
                     condition = (c != EOF) && (c != ' ');
                 }
-                if (check3 == 0)
+                if (check3 == 2)
+                {
+                    while (condition == 1)
+                    {
+                        counter++;
+                        character++;
+                        c = fgetc(file);
+                        condition = (c != EOF) && (c != ' ');
+                    }
+                }
+                else if (check3 == 0)
                 {
                     check1 = 0;
                     i = 0;
                     character = 0;
                 }
-                else if (check3 == 2)
-                {
-                    while (condition == 1)
-                    {
-                        counter += 1;
-                        character += 1;
-                        c = fgetc(file);
-                        condition = (c != EOF) && (c != ' ');
-                    }
-                }
-                else if (check3 != 0)
+                else
                 {
                     i = j;
                     check1 = 1;
@@ -298,52 +301,51 @@ int findstring(char address[], char string[], int starpos, int character, int li
             if (check == 0 && check1 == 1 && starpos == i)
             {
                 character -= 1;
-                check++;
+                check += 1;
                 while (condition == 1)
                 {
                     counter = counter + 1;
                     c = fgetc(file);
                     condition = (c != EOF) && (c != ' ');
-                    character++;
+                    character += 1;
                 }
                 if (c == ' ')
                     fchar = counter;
-                counter = counter - 1;
                 fseek(file, -check, SEEK_CUR);
+                counter = counter - 1;
             }
         }
         if (check1 == 1)
         {
             if (n <= i)
             {
-                check1--;
+                check1 = 0;
                 i = 0;
                 check = 0;
-                startchar = 1;
-                same++;
                 if (tmpresult == result)
+                {
                     continue;
+                }
+                startchar = 1;
+                same += 1;
+                tmpresult = result;
+                if (count != 0)
+                    character = 0;
                 else
                 {
-                    tmpresult = result;
-                    if (count != 0)
-                        character = 0;
-                    else
+                    if (at == same)
                     {
-                        if (at == same)
+                        line = startline;
+                        if (byword == 0)
                         {
-                            line = startline;
-                            if (byword == 0)
-                            {
-                                fclose(file);
-                                return result;
-                            }
-                            else
-                            {
-                                check2 = 1;
-                                fclose(file);
-                                break;
-                            }
+                            fclose(file);
+                            return result;
+                        }
+                        else
+                        {
+                            check2 = 1;
+                            fclose(file);
+                            break;
                         }
                     }
                 }
@@ -351,7 +353,7 @@ int findstring(char address[], char string[], int starpos, int character, int li
         }
         if (c == EOF)
             break;
-        if (c == ' ')
+        else if (c == ' ')
             fchar = counter;
         if (c == '\n')
         {
@@ -506,7 +508,7 @@ void findstr()
     else
     {
         scanf("%c", &tmpaddress);
-        while (tmpaddress != ' ')
+        while (tmpaddress != ' ' && tmpaddress != '\n')
         {
             address[roww] = tmpaddress;
             roww++;
@@ -677,6 +679,11 @@ void findstr()
                 }
             }
         }
+        else
+        {
+            printf("invalid options\n");
+            return;
+        }
     }
     else
     {
@@ -809,7 +816,7 @@ int replacefinder(char address[], char string[], int starpos, int *size, int *li
                 counter = counter + pos;
             }
         }
-        if ((string[i] == ' ') || (string[i] == 0))
+        if ((string[i] == ' ') || (string[i] == '\0'))
         {
             if (check == 0 && check1 == 1 && starpos == i)
             {
@@ -938,7 +945,7 @@ void pastestr()
     else
     {
         scanf("%c", &tmpaddress);
-        while (tmpaddress != ' ')
+        while (tmpaddress != ' ' && tmpaddress != '\n')
         {
             address[row] = tmpaddress;
             row++;
@@ -1126,7 +1133,7 @@ void cutstr()
     else
     {
         scanf("%c", &tmpaddress);
-        while (tmpaddress != ' ')
+        while (tmpaddress != ' ' && tmpaddress != '\n')
         {
             address[row] = tmpaddress;
             row++;
@@ -1290,7 +1297,7 @@ void copystr()
     else
     {
         scanf("%c", &tmpaddress);
-        while (tmpaddress != ' ')
+        while (tmpaddress != ' ' && tmpaddress != '\n')
         {
             address[row] = tmpaddress;
             row++;
@@ -1421,11 +1428,11 @@ void removestr()
 {
     char check;
     char tmpaddress;
-    char address[100];
+    char address[1000] = {'\0'};
     int row = 0;
-    char caddress[100] = "/home/melika";
+    char caddress[1000] = "/home/melika";
     char secondfile[2000] = "/home/melika/tempfiles";
-    char slash[100] = "/";
+    char slash[1000] = "/";
     char pos[10];
     int line, character, chartoremove;
     char size[10];
@@ -1479,7 +1486,7 @@ void removestr()
     else
     {
         scanf("%c", &tmpaddress);
-        while (tmpaddress != ' ')
+        while (tmpaddress != ' ' && tmpaddress != '\n')
         {
             address[row] = tmpaddress;
             row++;
@@ -1497,7 +1504,6 @@ void removestr()
         }
         else
         {
-            getchar();
             scanf("%s", pos);
             if (strcmp(pos, "--pos") == 0)
             {
@@ -1792,7 +1798,7 @@ void replacestr()
     else
     {
         scanf("%c", &tmpaddress);
-        while (tmpaddress != ' ')
+        while (tmpaddress != ' ' && tmpaddress != '\n')
         {
             address[roww] = tmpaddress;
             roww++;
@@ -1930,7 +1936,7 @@ void pathforcompare(char address[])
     else
     {
         scanf("%c", &tmpaddress);
-        while (tmpaddress != ' ')
+        while (tmpaddress != ' ' && tmpaddress != '\n')
         {
             faddress[row] = tmpaddress;
             row++;
@@ -2080,7 +2086,7 @@ void getaddressgrep(char address[], char filename[])
     else
     {
         scanf("%c", &tmpaddress);
-        while (tmpaddress != ' ')
+        while (tmpaddress != ' ' && tmpaddress != '\n')
         {
             faddress[roww] = tmpaddress;
             roww++;
@@ -2100,19 +2106,18 @@ void getaddressgrep(char address[], char filename[])
     }
 }
 
-int grep(char address[], char filename[], char string[], int option, int starpos)
+int grep(char address[], char filename[], char string[], int tmp, int option)
 {
     FILE *file = fopen(address, "r");
     char ch = fgetc(file);
     int character = 0;
     int count = 0;
-    int n;
-    int at = 1, coun = 0, byword = 0, all = 0;
+    int at = 1;
     int line = -1;
     int linecount = 1;
     int tmplline = -1;
-    n = replacefinder(address, string, starpos, &character, &line, at, coun, byword, all);
-    for (int i = 0; n >= 0; i++)
+    int n = replacefinder(address, string, tmp, &character, &line, at, 0, 0, 0);
+    while (n >= 0)
     {
         if (line != tmplline)
         {
@@ -2145,8 +2150,8 @@ int grep(char address[], char filename[], char string[], int option, int starpos
                 return 1;
             }
         }
-        at += 1;
-        n = replacefinder(address, string, starpos, &character, &line, at, coun, byword, all);
+        at++;
+        n = replacefinder(address, string, tmp, &character, &line, at, 0, 0, 0);
         tmplline = line;
     }
     fclose(file);
@@ -2266,7 +2271,7 @@ void grepstr()
         }
         else
         {
-            int n = grep(address, filename, fstring2, op, tmp);
+            int n = grep(address, filename, fstring2, tmp, op);
             if (n > 0)
                 count++;
             if ((op == 2) && (n > 0))
@@ -2280,7 +2285,6 @@ void grepstr()
     else if (count == 0)
         printf("not found\n");
 }
-
 // CAT for showing the whole contents of file
 void CAT()
 {
@@ -2316,7 +2320,13 @@ void CAT()
 
     else
     {
-        fgets(address, 1000, stdin);
+        scanf("%c", &tmpaddress);
+        while (tmpaddress != ' ' && tmpaddress != '\n')
+        {
+            address[row] = tmpaddress;
+            row++;
+            scanf("%c", &tmpaddress);
+        }
         strcat(slash, address);
         strcat(caddress, slash);
         if (existenceoffile(caddress) == 0)
@@ -2349,7 +2359,8 @@ void insert()
     char str1[2000] = {'\0'};
     int line, character;
     char pos[100] = {'\0'};
-    scanf(" %c", &check);
+    getchar();
+    scanf("%c", &check);
     if (check == '\"')
     {
         scanf("%c", &tmpaddress);
@@ -2440,7 +2451,7 @@ void insert()
     else
     {
         scanf("%c", &tmpaddress);
-        while (tmpaddress != ' ')
+        while (tmpaddress != ' ' && tmpaddress != '\n')
         {
             address[row] = tmpaddress;
             row++;
@@ -2702,7 +2713,7 @@ void indent()
     else
     {
         scanf("%c", &tmpaddress);
-        while (tmpaddress != ' ')
+        while (tmpaddress != ' ' && tmpaddress != '\n')
         {
             address[row] = tmpaddress;
             row++;
